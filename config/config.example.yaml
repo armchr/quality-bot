@@ -1,0 +1,109 @@
+# quality-bot configuration
+#
+# Environment variables can be referenced using:
+#   ${VAR_NAME}           - substitutes the value (empty if not set)
+#   ${VAR_NAME:-default}  - substitutes the value, or "default" if not set
+#
+# Example:
+#   url: "${CODEAPI_URL:-http://localhost:8181}"
+
+agent:
+  name: "quality-bot"
+  version: "1.0.0"
+
+codeapi:
+  url: "${CODEAPI_URL:-http://localhost:8181}"
+  timeout: 30s
+  retry:
+    max_attempts: 3
+    backoff_factor: 1.5
+    initial_delay: 100ms
+    max_delay: 5s
+
+concurrency:
+  max_parallel_detectors: 5
+  metrics_batch_size: 100
+  similarity_search_workers: 3
+  rate_limit_enabled: false
+  rate_limit_requests_per_sec: 10
+
+cache:
+  enabled: true
+  ttl: 1h
+  max_size_mb: 256
+
+detectors:
+  fail_fast: false
+
+  complexity:
+    enabled: true
+    cyclomatic_moderate: 10
+    cyclomatic_high: 15
+    cyclomatic_critical: 20
+    max_nesting_depth: 4
+
+  size_and_structure:
+    enabled: true
+    max_function_lines: 50
+    max_parameters: 5
+    max_class_methods: 20
+    max_class_fields: 15
+    max_file_lines: 500
+    max_file_functions: 20
+
+  coupling:
+    enabled: true
+    max_dependencies: 10
+    feature_envy_threshold: 3
+    intimacy_call_threshold: 3
+    primitive_field_threshold: 8
+
+  # dead_code: (FUTURE FEATURE - not yet implemented)
+  #   enabled: false
+  #   entry_points:
+  #     - "main"
+  #     - "init"
+  #   entry_point_patterns:
+  #     - "^test_"
+  #     - "^Test"
+
+  duplication:
+    enabled: true
+    similarity_threshold: 0.85
+    min_lines: 5
+    max_functions_to_check: 500
+
+exclusions:
+  file_patterns:
+    - "**/test/**"
+    - "**/tests/**"
+    - "**/generated/**"
+    - "**/vendor/**"
+  class_patterns:
+    - "^Test"
+    - "Mock$"
+  function_patterns:
+    - "^test_"
+
+severity:
+  min_severity: "low"
+  overrides:
+    primitive_obsession: "low"
+
+output:
+  formats:
+    - json
+    - markdown
+  output_dir: "${OUTPUT_DIR:-./reports}"
+  include_suggestions: true
+  include_metrics: true
+  include_code_snippets: false
+  max_issues_per_category: 100
+  hotspots_top_n: 10
+
+logging:
+  level: "${LOG_LEVEL:-debug}"  # debug, info, warn, error
+  format: "text"                # text or json
+  file: "all.log"                      # log to file (empty = stderr)
+  include_timestamp: true
+  include_caller: false
