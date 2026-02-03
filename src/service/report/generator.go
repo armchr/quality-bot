@@ -3,6 +3,7 @@ package report
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 
 	"quality-bot/src/config"
@@ -94,6 +95,13 @@ func (g *Generator) generateMarkdown(report *model.AnalysisReport) (string, erro
 	issuesByCategory := make(map[model.Category][]model.DebtIssue)
 	for _, issue := range report.Issues {
 		issuesByCategory[issue.Category] = append(issuesByCategory[issue.Category], issue)
+	}
+
+	// Sort issues by severity within each category (critical first)
+	for cat := range issuesByCategory {
+		sort.Slice(issuesByCategory[cat], func(i, j int) bool {
+			return severityPriority(issuesByCategory[cat][i].Severity) < severityPriority(issuesByCategory[cat][j].Severity)
+		})
 	}
 
 	for _, cat := range []model.Category{model.CategoryComplexity, model.CategorySize, model.CategoryCoupling, model.CategoryDuplication} {
@@ -245,5 +253,19 @@ func sarifLevel(s model.Severity) string {
 		return "warning"
 	default:
 		return "note"
+	}
+}
+
+// severityPriority returns a numeric priority for sorting (lower = more critical)
+func severityPriority(s model.Severity) int {
+	switch s {
+	case model.SeverityCritical:
+		return 0
+	case model.SeverityHigh:
+		return 1
+	case model.SeverityMedium:
+		return 2
+	default:
+		return 3
 	}
 }

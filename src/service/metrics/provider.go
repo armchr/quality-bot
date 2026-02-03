@@ -35,6 +35,11 @@ func NewProvider(client *codeapi.Client, repoName string, cfg config.CacheConfig
 	}
 }
 
+// RepoName returns the repository name
+func (p *Provider) RepoName() string {
+	return p.repoName
+}
+
 // GetAllFunctionMetrics retrieves metrics for all functions
 func (p *Provider) GetAllFunctionMetrics(ctx context.Context) ([]model.FunctionMetrics, error) {
 	p.mu.RLock()

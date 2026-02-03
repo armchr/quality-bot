@@ -57,7 +57,7 @@ func (c *Client) ExecuteCypher(ctx context.Context, repoName, query string) ([]m
 
 // SearchSimilarCode finds semantically similar code
 func (c *Client) SearchSimilarCode(ctx context.Context, req SimilarCodeRequest) (*SimilarCodeResponse, error) {
-	util.Debug("Searching similar code for function: %s", req.FunctionID)
+	util.Debug("Searching similar code in repo %s (language: %s)", req.RepoName, req.Language)
 
 	var resp SimilarCodeResponse
 	if err := c.post(ctx, "/api/v1/searchSimilarCode", req, &resp); err != nil {
@@ -65,7 +65,7 @@ func (c *Client) SearchSimilarCode(ctx context.Context, req SimilarCodeRequest) 
 		return nil, err
 	}
 
-	util.Debug("Found %d similar code matches", len(resp.Matches))
+	util.Debug("Found %d similar code matches", len(resp.Results))
 	return &resp, nil
 }
 

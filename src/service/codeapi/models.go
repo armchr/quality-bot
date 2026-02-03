@@ -14,27 +14,33 @@ type CypherResponse struct {
 
 // SimilarCodeRequest represents a request to search for similar code
 type SimilarCodeRequest struct {
-	RepoName   string  `json:"repo_name"`
-	SourceCode string  `json:"source_code,omitempty"`
-	FunctionID string  `json:"function_id,omitempty"`
-	TopK       int     `json:"top_k"`
-	MinScore   float64 `json:"min_score"`
+	RepoName    string `json:"repo_name"`
+	CodeSnippet string `json:"code_snippet"`
+	Language    string `json:"language"`
+	Limit       int    `json:"limit,omitempty"`
+	IncludeCode bool   `json:"include_code,omitempty"`
 }
 
 // SimilarCodeResponse represents the response from a similarity search
 type SimilarCodeResponse struct {
-	Matches []SimilarCodeMatch `json:"matches"`
+	Results []SimilarCodeResult `json:"results"`
+	Success bool                `json:"success"`
 }
 
-// SimilarCodeMatch represents a single match from similarity search
-type SimilarCodeMatch struct {
-	FunctionID   string  `json:"function_id"`
-	FunctionName string  `json:"function_name"`
-	FilePath     string  `json:"file_path"`
-	StartLine    int     `json:"start_line"`
-	EndLine      int     `json:"end_line"`
-	Score        float64 `json:"score"`
-	ClassName    string  `json:"class_name,omitempty"`
+// SimilarCodeResult represents a single result from similarity search
+type SimilarCodeResult struct {
+	Chunk SimilarCodeChunk `json:"chunk"`
+	Score float64          `json:"score"`
+	Code  string           `json:"code,omitempty"`
+}
+
+// SimilarCodeChunk represents the matched code chunk metadata
+type SimilarCodeChunk struct {
+	FilePath  string `json:"file_path"`
+	StartLine int    `json:"start_line"`
+	EndLine   int    `json:"end_line"`
+	ChunkType string `json:"chunk_type"`
+	Name      string `json:"name"`
 }
 
 // FunctionsRequest represents a request to get functions
